@@ -1,6 +1,77 @@
 import Script from "next/script";
+import { isPasswordConfigured, isUnlocked } from "./password-auth";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+type HomeProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function Home({ searchParams }: HomeProps) {
+  const unlocked = await isUnlocked();
+  if (unlocked) return <CameraCoach />;
+
+  const params = searchParams ? await searchParams : {};
+  const error = typeof params.error === "string" ? params.error : undefined;
+
+  return (
+    <PasswordGate
+      isMissingConfig={error === "missing" || !isPasswordConfigured()}
+      isWrongPassword={error === "1"}
+    />
+  );
+}
+
+function PasswordGate({
+  isMissingConfig,
+  isWrongPassword,
+}: {
+  isMissingConfig: boolean;
+  isWrongPassword: boolean;
+}) {
+  return (
+    <main className="lock-shell">
+      <section className="lock-stage" aria-label="Plateful password gate">
+        <div className="demo-table lock-demo" aria-hidden="true">
+          <div className="demo-plate">
+            <span className="demo-yolk" />
+            <span className="demo-leaf leaf-one" />
+            <span className="demo-leaf leaf-two" />
+          </div>
+          <div className="demo-cutlery" />
+        </div>
+
+        <form className="lock-panel" action="/api/unlock" method="post">
+          <p className="eyebrow">Plateful</p>
+          <h1>Enter password</h1>
+          <p>
+            Use the shared password to open the camera coach on this device.
+          </p>
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            autoFocus
+            required
+          />
+          {isWrongPassword ? (
+            <p className="lock-error">That password did not work.</p>
+          ) : null}
+          {isMissingConfig ? (
+            <p className="lock-error">Password access is not configured yet.</p>
+          ) : null}
+          <button className="primary-button" type="submit">
+            Unlock
+          </button>
+        </form>
+      </section>
+    </main>
+  );
+}
+
+function CameraCoach() {
   return (
     <>
       <main className="app-shell">

@@ -3,6 +3,7 @@ const APP_FILES = [
   "./",
   "./index.html",
   "./styles.css",
+  "./gate.js",
   "./app.js",
   "./manifest.webmanifest",
   "./icon.svg"

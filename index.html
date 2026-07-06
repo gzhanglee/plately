@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#111314">
+    <title>Plateful Camera Coach</title>
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="camera-stage" id="cameraStage" data-mode="flat" aria-label="Camera preview">
+        <video id="cameraPreview" class="camera-preview" autoplay muted playsinline></video>
+        <canvas id="analysisCanvas" class="analysis-canvas" width="120" height="90"></canvas>
+
+        <div class="demo-table" aria-hidden="true">
+          <div class="demo-plate">
+            <span class="demo-yolk"></span>
+            <span class="demo-leaf leaf-one"></span>
+            <span class="demo-leaf leaf-two"></span>
+          </div>
+          <div class="demo-cutlery"></div>
+        </div>
+
+        <header class="top-bar">
+          <div>
+            <p class="eyebrow">Plateful</p>
+            <h1>Camera coach</h1>
+          </div>
+          <div class="top-actions" aria-label="Camera controls">
+            <button class="icon-button" id="switchCamera" type="button" aria-label="Switch camera" title="Switch camera">
+              <span class="icon flip-icon" aria-hidden="true"></span>
+            </button>
+            <button class="score-pill" id="scorePill" type="button" aria-label="Current shot score">
+              <span id="scoreValue">--</span>
+              <span>score</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="shot-overlay" id="shotOverlay" aria-hidden="true">
+          <div class="thirds-grid"></div>
+          <div class="plate-ring"></div>
+          <div class="angle-rail"></div>
+          <div class="macro-window"></div>
+          <div class="drink-column"></div>
+          <div class="spread-zones">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="focus-marker" id="focusMarker"></div>
+          <div class="horizon-meter" id="horizonMeter">
+            <span></span>
+          </div>
+        </div>
+
+        <div class="permission-panel" id="permissionPanel">
+          <div class="camera-glyph" aria-hidden="true"></div>
+          <p class="panel-kicker">Live preview</p>
+          <h2>Point at your plate.</h2>
+          <p id="permissionText">The coach will read the light and frame, then suggest one small adjustment.</p>
+          <button class="primary-button" id="startCamera" type="button">Start camera</button>
+        </div>
+
+        <button class="shutter-button" id="captureShot" type="button" aria-label="Capture shot">
+          <span></span>
+        </button>
+      </section>
+
+      <section class="coach-panel" aria-label="Food photography coach">
+        <div class="coach-line">
+          <p class="coach-label">Now</p>
+          <p id="coachTip">Choose a shot style and start the camera.</p>
+        </div>
+
+        <div class="metric-row" aria-label="Shot readings">
+          <div class="metric">
+            <span id="lightMetric">--</span>
+            <p>light</p>
+          </div>
+          <div class="metric">
+            <span id="sharpMetric">--</span>
+            <p>sharp</p>
+          </div>
+          <div class="metric">
+            <span id="colorMetric">--</span>
+            <p>color</p>
+          </div>
+        </div>
+
+        <div class="mode-strip" id="modeStrip" aria-label="Shot styles">
+          <button class="mode-button is-active" type="button" data-mode="flat">
+            <span class="mode-icon flat-icon" aria-hidden="true"></span>
+            <span>Flat lay</span>
+          </button>
+          <button class="mode-button" type="button" data-mode="angle">
+            <span class="mode-icon angle-icon" aria-hidden="true"></span>
+            <span>45 deg</span>
+          </button>
+          <button class="mode-button" type="button" data-mode="macro">
+            <span class="mode-icon macro-icon" aria-hidden="true"></span>
+            <span>Macro</span>
+          </button>
+          <button class="mode-button" type="button" data-mode="drink">
+            <span class="mode-icon drink-icon" aria-hidden="true"></span>
+            <span>Drink</span>
+          </button>
+          <button class="mode-button" type="button" data-mode="spread">
+            <span class="mode-icon spread-icon" aria-hidden="true"></span>
+            <span>Table</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="review-sheet" id="reviewSheet" hidden aria-label="Captured shot review">
+        <div class="review-backdrop" id="closeReview"></div>
+        <div class="review-card">
+          <div class="review-header">
+            <div>
+              <p class="eyebrow">Captured</p>
+              <h2 id="reviewScore">Shot saved</h2>
+            </div>
+            <button class="icon-button" id="closeReviewButton" type="button" aria-label="Close review" title="Close review">
+              <span class="icon close-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+          <img id="reviewImage" alt="Captured food shot">
+          <p id="reviewTip" class="review-tip">Clean photo captured without guides.</p>
+          <div class="review-actions">
+            <a class="secondary-button" id="downloadShot" href="#" download="plateful-shot.jpg">Download</a>
+            <button class="primary-button" id="shareShot" type="button">Share</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>

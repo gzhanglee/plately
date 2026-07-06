@@ -1,0 +1,18 @@
+{
+  "name": "Plateful Camera Coach",
+  "short_name": "Plateful",
+  "description": "A live food photography coach with camera overlays and simple shot feedback.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#111314",
+  "theme_color": "#111314",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

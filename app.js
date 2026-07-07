@@ -1,84 +1,45 @@
 const modes = {
   flat: {
     label: "Overhead",
+    reason: "Best for boards, spreads, and graphic shapes.",
     targetX: 0.5,
     targetY: 0.5,
     tip: "Go top-down and keep the rim just inside the circle."
   },
   angle: {
     label: "45 deg",
+    reason: "Shows sauce, height, and the table story.",
     targetX: 0.48,
     targetY: 0.6,
     tip: "Step back, use 2x if you can, and let the front edge fill the lower guide."
   },
   straight: {
     label: "Straight-on",
+    reason: "Best for layers, height, and pours.",
     targetX: 0.5,
     targetY: 0.58,
     tip: "Shoot level with the food and keep the table line calm."
   },
   macro: {
     label: "Macro",
+    reason: "Makes texture, steam, and crisp edges the subject.",
     targetX: 0.5,
     targetY: 0.5,
     tip: "Fill the square with the best texture and tap the crispest edge."
   },
   drink: {
     label: "Drink",
+    reason: "Leaves room for glass height and shine.",
     targetX: 0.38,
     targetY: 0.48,
     tip: "Put the glass in the tall guide and leave breathing room on one side."
   },
   spread: {
     label: "Table",
+    reason: "Keeps the meal readable as a full scene.",
     targetX: 0.5,
     targetY: 0.52,
     tip: "Let the main dish own the middle zone and keep side plates at the edges."
-  }
-};
-
-const dishes = {
-  plate: {
-    mode: "angle",
-    angle: "45 deg",
-    reason: "Shows sauce, height, and the table story.",
-    tip: "Use 45 deg and let one side of the plate catch the light."
-  },
-  bowl: {
-    mode: "angle",
-    angle: "45 deg",
-    reason: "Keeps depth visible inside the bowl.",
-    tip: "Use 45 deg so the rim frames the food without hiding the center."
-  },
-  stack: {
-    mode: "straight",
-    angle: "Straight-on",
-    reason: "Best for layers, height, and pours.",
-    tip: "Go straight-on and keep the tallest edge slightly above center."
-  },
-  board: {
-    mode: "flat",
-    angle: "Overhead",
-    reason: "Turns shapes and repeats into the composition.",
-    tip: "Go overhead and arrange the board so shapes lead around the frame."
-  },
-  drink: {
-    mode: "drink",
-    angle: "Straight or 45 deg",
-    reason: "Leaves room for glass height and shine.",
-    tip: "Place the glass in the tall guide, then rotate it until the rim catches light."
-  },
-  texture: {
-    mode: "macro",
-    angle: "Macro",
-    reason: "Makes steam, crisp edges, and gloss the subject.",
-    tip: "Move close and make the most textured edge the hero."
-  },
-  table: {
-    mode: "spread",
-    angle: "Overhead",
-    reason: "Keeps the meal readable as a full scene.",
-    tip: "Keep the main dish in the center zone and let side plates frame it."
   }
 };
 
@@ -113,7 +74,6 @@ const state = {
   stream: null,
   facingMode: "environment",
   mode: "angle",
-  dish: "plate",
   guide: "clean",
   lastTip: "",
   lastScore: null,
@@ -146,7 +106,6 @@ const els = {
   lightDirection: document.querySelector("#lightDirection"),
   lightNote: document.querySelector("#lightNote"),
   lightCompass: document.querySelector("#lightCompass"),
-  dishStrip: document.querySelector("#dishStrip"),
   modeStrip: document.querySelector("#modeStrip"),
   guideDrawer: document.querySelector("#guideDrawer"),
   guideSummary: document.querySelector("#guideSummary"),
@@ -183,18 +142,6 @@ function setMode(mode) {
   setTip(modes[mode].tip);
 }
 
-function setDish(dish) {
-  const preset = dishes[dish];
-  if (!preset) return;
-  state.dish = dish;
-  for (const button of els.dishStrip.querySelectorAll(".choice-button")) {
-    button.classList.toggle("is-active", button.dataset.dish === dish);
-  }
-  setMode(preset.mode);
-  updateAngleCard();
-  setTip(preset.tip);
-}
-
 function setGuide(guide) {
   if (!guides[guide]) return;
   state.guide = guide;
@@ -207,14 +154,10 @@ function setGuide(guide) {
 }
 
 function updateAngleCard() {
-  const preset = dishes[state.dish];
   const mode = modes[state.mode];
-  if (!preset || !mode) return;
-  const isRecommended = preset.mode === state.mode;
-  els.anglePick.textContent = isRecommended ? preset.angle : mode.label;
-  els.angleReason.textContent = isRecommended
-    ? preset.reason
-    : `${preset.angle} is the usual pick for this dish.`;
+  if (!mode) return;
+  els.anglePick.textContent = mode.label;
+  els.angleReason.textContent = mode.reason;
 }
 
 function waitForVideoFrame() {
@@ -522,10 +465,6 @@ function describeLight(reading) {
 }
 
 function chooseTip(reading, scores) {
-  const preset = dishes[state.dish];
-  if (preset && preset.mode !== state.mode && scores.composeScore < 72) {
-    return `Try ${preset.angle.toLowerCase()} for this dish; it will read more naturally.`;
-  }
   if (reading.clipBrightPct > 0.08) {
     return "Turn the plate slightly away from the glare, then expose for the brightest sauce.";
   }
@@ -559,7 +498,7 @@ function chooseTip(reading, scores) {
   if (state.mode === "macro" && scores.score > 74) {
     return "Texture is landing. Shoot now before steam or gloss fades.";
   }
-  return preset?.tip || modes[state.mode].tip;
+  return modes[state.mode].tip;
 }
 
 function compositionTip(reading) {
@@ -732,10 +671,6 @@ function bindEvents() {
     const button = event.target.closest("[data-mode]");
     if (button) setMode(button.dataset.mode);
   });
-  els.dishStrip.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-dish]");
-    if (button) setDish(button.dataset.dish);
-  });
   els.guideStrip.addEventListener("click", (event) => {
     const button = event.target.closest("[data-guide]");
     if (button) {
@@ -764,6 +699,6 @@ async function registerServiceWorker() {
 }
 
 bindEvents();
-setDish("plate");
+setMode("angle");
 setGuide("clean");
 registerServiceWorker();

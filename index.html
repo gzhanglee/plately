@@ -8,19 +8,7 @@
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="stylesheet" href="./styles.css">
   </head>
-  <body class="locked">
-    <section class="site-lock" id="siteLock" aria-label="Plateful password">
-      <form class="lock-panel" id="lockForm">
-        <p class="eyebrow">Plateful</p>
-        <h1>Enter password</h1>
-        <p>Use the shared password to open the camera coach on this device.</p>
-        <label for="lockPassword">Password</label>
-        <input id="lockPassword" type="password" autocomplete="current-password" required>
-        <p class="lock-error" id="lockError" hidden>That password did not work.</p>
-        <button class="primary-button" type="submit">Unlock</button>
-      </form>
-    </section>
-
+  <body>
     <main class="app-shell">
       <section class="camera-stage" id="cameraStage" data-mode="flat" aria-label="Camera preview">
         <video id="cameraPreview" class="camera-preview" autoplay muted playsinline></video>
@@ -148,7 +136,6 @@
       </section>
     </main>
 
-    <script src="./gate.js" type="module"></script>
     <script src="./app.js" type="module"></script>
   </body>
 </html>

@@ -1,9 +1,8 @@
-const CACHE_NAME = "plateful-v1";
+const CACHE_NAME = "plateful-v2";
 const APP_FILES = [
   "./",
   "./index.html",
   "./styles.css",
-  "./gate.js",
   "./app.js",
   "./manifest.webmanifest",
   "./icon.svg"

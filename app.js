@@ -1,37 +1,118 @@
 const modes = {
   flat: {
+    label: "Overhead",
     targetX: 0.5,
     targetY: 0.5,
     tip: "Go top-down and keep the rim just inside the circle."
   },
   angle: {
+    label: "45 deg",
     targetX: 0.48,
     targetY: 0.6,
     tip: "Step back, use 2x if you can, and let the front edge fill the lower guide."
   },
+  straight: {
+    label: "Straight-on",
+    targetX: 0.5,
+    targetY: 0.58,
+    tip: "Shoot level with the food and keep the table line calm."
+  },
   macro: {
+    label: "Macro",
     targetX: 0.5,
     targetY: 0.5,
     tip: "Fill the square with the best texture and tap the crispest edge."
   },
   drink: {
+    label: "Drink",
     targetX: 0.38,
     targetY: 0.48,
     tip: "Put the glass in the tall guide and leave breathing room on one side."
   },
   spread: {
+    label: "Table",
     targetX: 0.5,
     targetY: 0.52,
     tip: "Let the main dish own the middle zone and keep side plates at the edges."
   }
 };
 
+const dishes = {
+  plate: {
+    mode: "angle",
+    angle: "45 deg",
+    reason: "Shows sauce, height, and the table story.",
+    tip: "Use 45 deg and let one side of the plate catch the light."
+  },
+  bowl: {
+    mode: "angle",
+    angle: "45 deg",
+    reason: "Keeps depth visible inside the bowl.",
+    tip: "Use 45 deg so the rim frames the food without hiding the center."
+  },
+  stack: {
+    mode: "straight",
+    angle: "Straight-on",
+    reason: "Best for layers, height, and pours.",
+    tip: "Go straight-on and keep the tallest edge slightly above center."
+  },
+  board: {
+    mode: "flat",
+    angle: "Overhead",
+    reason: "Turns shapes and repeats into the composition.",
+    tip: "Go overhead and arrange the board so shapes lead around the frame."
+  },
+  drink: {
+    mode: "drink",
+    angle: "Straight or 45 deg",
+    reason: "Leaves room for glass height and shine.",
+    tip: "Place the glass in the tall guide, then rotate it until the rim catches light."
+  },
+  texture: {
+    mode: "macro",
+    angle: "Macro",
+    reason: "Makes steam, crisp edges, and gloss the subject.",
+    tip: "Move close and make the most textured edge the hero."
+  },
+  table: {
+    mode: "spread",
+    angle: "Overhead",
+    reason: "Keeps the meal readable as a full scene.",
+    tip: "Keep the main dish in the center zone and let side plates frame it."
+  }
+};
+
+const guides = {
+  clean: {
+    tip: "Keep the hero dish clear, then remove anything that distracts from it."
+  },
+  lines: {
+    tip: "Use a utensil, table edge, or garnish line to point toward the best bite."
+  },
+  layers: {
+    tip: "Build foreground, hero, and background so the dish feels deeper."
+  },
+  frame: {
+    tip: "Let the plate, fork, glass, or napkin frame the ingredient people should notice."
+  },
+  pattern: {
+    tip: "Repeat circles, slices, or small plates so the eye keeps moving."
+  },
+  space: {
+    tip: "Leave one clean area of table for a calmer, more editorial crop."
+  }
+};
+
 const state = {
   stream: null,
   facingMode: "environment",
-  mode: "flat",
+  mode: "angle",
+  dish: "plate",
+  guide: "clean",
   lastTip: "",
   lastScore: null,
+  lastReading: null,
+  lastScores: null,
   lastBlob: null,
   orientation: {
     beta: null,
@@ -54,7 +135,14 @@ const els = {
   lightMetric: document.querySelector("#lightMetric"),
   sharpMetric: document.querySelector("#sharpMetric"),
   colorMetric: document.querySelector("#colorMetric"),
+  anglePick: document.querySelector("#anglePick"),
+  angleReason: document.querySelector("#angleReason"),
+  lightDirection: document.querySelector("#lightDirection"),
+  lightNote: document.querySelector("#lightNote"),
+  lightCompass: document.querySelector("#lightCompass"),
+  dishStrip: document.querySelector("#dishStrip"),
   modeStrip: document.querySelector("#modeStrip"),
+  guideStrip: document.querySelector("#guideStrip"),
   horizonMeter: document.querySelector("#horizonMeter span"),
   reviewSheet: document.querySelector("#reviewSheet"),
   closeReview: document.querySelector("#closeReview"),
@@ -62,6 +150,7 @@ const els = {
   reviewImage: document.querySelector("#reviewImage"),
   reviewScore: document.querySelector("#reviewScore"),
   reviewTip: document.querySelector("#reviewTip"),
+  reviewEdits: document.querySelector("#reviewEdits"),
   downloadShot: document.querySelector("#downloadShot"),
   shareShot: document.querySelector("#shareShot")
 };
@@ -82,13 +171,47 @@ function setMode(mode) {
   for (const button of els.modeStrip.querySelectorAll(".mode-button")) {
     button.classList.toggle("is-active", button.dataset.mode === mode);
   }
+  updateAngleCard();
   setTip(modes[mode].tip);
+}
+
+function setDish(dish) {
+  const preset = dishes[dish];
+  if (!preset) return;
+  state.dish = dish;
+  for (const button of els.dishStrip.querySelectorAll(".choice-button")) {
+    button.classList.toggle("is-active", button.dataset.dish === dish);
+  }
+  setMode(preset.mode);
+  updateAngleCard();
+  setTip(preset.tip);
+}
+
+function setGuide(guide) {
+  if (!guides[guide]) return;
+  state.guide = guide;
+  els.stage.dataset.guide = guide;
+  for (const button of els.guideStrip.querySelectorAll(".choice-button")) {
+    button.classList.toggle("is-active", button.dataset.guide === guide);
+  }
+  setTip(guides[guide].tip);
+}
+
+function updateAngleCard() {
+  const preset = dishes[state.dish];
+  const mode = modes[state.mode];
+  if (!preset || !mode) return;
+  const isRecommended = preset.mode === state.mode;
+  els.anglePick.textContent = isRecommended ? preset.angle : mode.label;
+  els.angleReason.textContent = isRecommended
+    ? preset.reason
+    : `${preset.angle} is the usual pick for this dish.`;
 }
 
 async function startCamera() {
   if (!navigator.mediaDevices?.getUserMedia) {
     showCameraMessage("This browser cannot open the camera. You can still explore the overlays here.");
-    setTip("Open this app in Chrome on your Pixel for the live camera coach.");
+    setTip("Open this app in a modern browser with camera access for the live coach.");
     return;
   }
 
@@ -157,6 +280,14 @@ function readFrame() {
   let blueSum = 0;
   let clippedBright = 0;
   let clippedDark = 0;
+  let leftSum = 0;
+  let rightSum = 0;
+  let topSum = 0;
+  let bottomSum = 0;
+  let leftCount = 0;
+  let rightCount = 0;
+  let topCount = 0;
+  let bottomCount = 0;
 
   for (let index = 0, pixel = 0; index < data.length; index += 4, pixel += 1) {
     const r = data[index];
@@ -174,6 +305,23 @@ function readFrame() {
     blueSum += b;
     if (max > 244) clippedBright += 1;
     if (luma < 18) clippedDark += 1;
+
+    const x = pixel % width;
+    const y = Math.floor(pixel / width);
+    if (x < width * 0.42) {
+      leftSum += luma;
+      leftCount += 1;
+    } else if (x > width * 0.58) {
+      rightSum += luma;
+      rightCount += 1;
+    }
+    if (y < height * 0.42) {
+      topSum += luma;
+      topCount += 1;
+    } else if (y > height * 0.58) {
+      bottomSum += luma;
+      bottomCount += 1;
+    }
   }
 
   const pixels = width * height;
@@ -219,7 +367,11 @@ function readFrame() {
     focusY,
     redBlueRatio,
     clipBrightPct,
-    clipDarkPct
+    clipDarkPct,
+    leftAvg: leftSum / Math.max(1, leftCount),
+    rightAvg: rightSum / Math.max(1, rightCount),
+    topAvg: topSum / Math.max(1, topCount),
+    bottomAvg: bottomSum / Math.max(1, bottomCount)
   };
 }
 
@@ -234,6 +386,15 @@ function updateCoach(reading) {
   const score = round(lightScore * 0.34 + sharpScore * 0.22 + colorScore * 0.16 + composeScore * 0.2 + contrastScore * 0.08);
 
   state.lastScore = score;
+  state.lastReading = reading;
+  state.lastScores = {
+    lightScore,
+    sharpScore,
+    colorScore,
+    composeScore,
+    contrastScore,
+    score
+  };
   els.scoreValue.textContent = String(score);
   els.lightMetric.textContent = String(lightScore);
   els.sharpMetric.textContent = String(sharpScore);
@@ -242,19 +403,83 @@ function updateCoach(reading) {
   els.stage.style.setProperty("--focus-x", `${round(reading.focusX * 100)}%`);
   els.stage.style.setProperty("--focus-y", `${round(reading.focusY * 100)}%`);
   updateHorizon();
+  updateLightCard(reading);
 
-  const tip = chooseTip(reading, {
-    lightScore,
-    sharpScore,
-    colorScore,
-    composeScore,
-    contrastScore,
-    score
-  });
+  const tip = chooseTip(reading, state.lastScores);
   setTip(tip);
 }
 
+function updateLightCard(reading) {
+  const profile = describeLight(reading);
+  els.lightDirection.textContent = profile.label;
+  els.lightNote.textContent = profile.note;
+  els.lightCompass.dataset.direction = profile.direction;
+}
+
+function describeLight(reading) {
+  if (reading.clipBrightPct > 0.08) {
+    return {
+      label: "Glare",
+      note: "Turn the plate until shine shows texture instead of a white patch.",
+      direction: "glare"
+    };
+  }
+  if (reading.avg < 95) {
+    return {
+      label: "Too dim",
+      note: "Move closer to a window or brighter table edge.",
+      direction: "dim"
+    };
+  }
+  if (reading.avg > 178) {
+    return {
+      label: "Too bright",
+      note: "Back away from hard light so highlights keep detail.",
+      direction: "bright"
+    };
+  }
+
+  const sideDelta = reading.leftAvg - reading.rightAvg;
+  const verticalDelta = reading.topAvg - reading.bottomAvg;
+  if (Math.abs(sideDelta) > 16) {
+    return sideDelta > 0
+      ? {
+          label: "Left side",
+          note: "Good side light. Rotate glossy food slightly toward it.",
+          direction: "left"
+        }
+      : {
+          label: "Right side",
+          note: "Good side light. Keep shadows soft, not muddy.",
+          direction: "right"
+        };
+  }
+  if (Math.abs(verticalDelta) > 18) {
+    return verticalDelta > 0
+      ? {
+          label: "Top heavy",
+          note: "Angle the plate for shape; overhead light can flatten food.",
+          direction: "top"
+        }
+      : {
+          label: "Low light",
+          note: "Lift the phone or plate so the main dish catches more light.",
+          direction: "bottom"
+        };
+  }
+
+  return {
+    label: "Soft even",
+    note: "Nice for clean flat lays. Add a darker surface if the food feels flat.",
+    direction: "even"
+  };
+}
+
 function chooseTip(reading, scores) {
+  const preset = dishes[state.dish];
+  if (preset && preset.mode !== state.mode && scores.composeScore < 72) {
+    return `Try ${preset.angle.toLowerCase()} for this dish; it will read more naturally.`;
+  }
   if (reading.clipBrightPct > 0.08) {
     return "Turn the plate slightly away from the glare, then expose for the brightest sauce.";
   }
@@ -276,13 +501,19 @@ function chooseTip(reading, scores) {
   if (scores.contrastScore < 48) {
     return "Add side light or a darker background so the food has shape.";
   }
+  if (state.guide !== "clean" && scores.score > 66) {
+    return guides[state.guide].tip;
+  }
   if (state.mode === "angle" && scores.score > 74) {
     return "This angle is working. Take two shots, then try one slightly lower.";
+  }
+  if (state.mode === "straight" && scores.score > 74) {
+    return "The height reads well. Take one clean shot, then add a hand or utensil for life.";
   }
   if (state.mode === "macro" && scores.score > 74) {
     return "Texture is landing. Shoot now before steam or gloss fades.";
   }
-  return modes[state.mode].tip;
+  return preset?.tip || modes[state.mode].tip;
 }
 
 function compositionTip(reading) {
@@ -359,7 +590,72 @@ async function captureShot() {
   els.downloadShot.download = `plateful-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.jpg`;
   els.reviewScore.textContent = state.lastScore ? `${state.lastScore} score` : "Demo shot";
   els.reviewTip.textContent = state.lastTip || "Clean photo captured without guides.";
+  renderReviewEdits();
   els.reviewSheet.hidden = false;
+}
+
+function renderReviewEdits() {
+  const edits = getReviewEdits();
+  els.reviewEdits.replaceChildren();
+  for (const edit of edits) {
+    const item = document.createElement("li");
+    item.textContent = edit;
+    els.reviewEdits.append(item);
+  }
+}
+
+function getReviewEdits() {
+  const reading = state.lastReading;
+  const scores = state.lastScores;
+  const edits = [];
+
+  if (!reading || !scores) {
+    return [
+      "Crop tighter around the main plate.",
+      "Lift contrast so the food separates from the table.",
+      "Try one alternate angle before sharing."
+    ];
+  }
+
+  if (reading.clipBrightPct > 0.06) {
+    edits.push("Lower highlights to bring detail back into glossy areas.");
+  } else if (scores.lightScore < 55 && reading.avg < 110) {
+    edits.push("Raise exposure slightly, then add contrast back to the food.");
+  } else if (scores.lightScore < 55 && reading.avg > 166) {
+    edits.push("Lower exposure a touch so sauces and pale plates keep texture.");
+  }
+
+  if (scores.colorScore < 60 && reading.redBlueRatio > 1.45) {
+    edits.push("Cool white balance until whites look clean, not orange.");
+  } else if (scores.colorScore < 60 && reading.redBlueRatio < 0.88) {
+    edits.push("Warm white balance slightly so the food does not feel cold.");
+  }
+
+  if (scores.contrastScore < 50) {
+    edits.push("Add a little contrast or black point for more shape.");
+  }
+  if (scores.composeScore < 58) {
+    edits.push("Crop so the hero dish sits closer to the active guide.");
+  }
+  if (scores.sharpScore < 44) {
+    edits.push("Retake with a steadier hand and tap the crispest edge.");
+  }
+  if (state.guide === "space") {
+    edits.push("Keep the empty table area clean for a calmer social crop.");
+  } else if (state.guide === "pattern") {
+    edits.push("Square the crop if repeated shapes are the strongest part.");
+  }
+
+  while (edits.length < 3) {
+    const fallback = [
+      "Try a square crop and compare it with the full frame.",
+      "Lift texture or clarity lightly on the food, not the background.",
+      "Make one warmer and one cooler version before choosing."
+    ][edits.length];
+    edits.push(fallback);
+  }
+
+  return edits.slice(0, 3);
 }
 
 async function shareShot() {
@@ -390,6 +686,14 @@ function bindEvents() {
     const button = event.target.closest("[data-mode]");
     if (button) setMode(button.dataset.mode);
   });
+  els.dishStrip.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-dish]");
+    if (button) setDish(button.dataset.dish);
+  });
+  els.guideStrip.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-guide]");
+    if (button) setGuide(button.dataset.guide);
+  });
   els.closeReview.addEventListener("click", closeReviewSheet);
   els.closeReviewButton.addEventListener("click", closeReviewSheet);
   els.shareShot.addEventListener("click", shareShot);
@@ -411,5 +715,6 @@ async function registerServiceWorker() {
 }
 
 bindEvents();
-setMode("flat");
+setDish("plate");
+setGuide("clean");
 registerServiceWorker();

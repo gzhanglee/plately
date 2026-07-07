@@ -2,4 +2,7 @@
 
 Static GitHub Pages build of Plateful.
 
-This branch opens directly to the Plateful camera coach without a password gate.
+This branch opens directly to the public Plateful camera coach.
+
+Current version adds dish-based angle recommendations, light-direction feedback,
+composition guide overlays, and post-shot editing suggestions.

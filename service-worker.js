@@ -1,4 +1,4 @@
-const CACHE_NAME = "plateful-v2";
+const CACHE_NAME = "plateful-v3";
 const APP_FILES = [
   "./",
   "./index.html",

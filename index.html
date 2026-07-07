@@ -50,6 +50,31 @@
             <span></span>
             <span></span>
           </div>
+          <div class="straight-frame"></div>
+          <div class="line-guides">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="layer-bands">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="frame-guide">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="pattern-guide">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="space-guide"></div>
           <div class="focus-marker" id="focusMarker"></div>
           <div class="horizon-meter" id="horizonMeter">
             <span></span>
@@ -90,14 +115,44 @@
           </div>
         </div>
 
+        <div class="decision-row" aria-label="Shot guidance">
+          <div class="decision-block">
+            <p>angle</p>
+            <strong id="anglePick">Overhead</strong>
+            <span id="angleReason">Best for shape and symmetry.</span>
+          </div>
+          <div class="decision-block">
+            <div class="decision-heading">
+              <p>light</p>
+              <span class="light-compass" id="lightCompass" aria-hidden="true"></span>
+            </div>
+            <strong id="lightDirection">Waiting</strong>
+            <span id="lightNote">Start camera to read direction.</span>
+          </div>
+        </div>
+
+        <div class="choice-strip dish-strip" id="dishStrip" aria-label="Dish type">
+          <button class="choice-button is-active" type="button" data-dish="plate">Plate</button>
+          <button class="choice-button" type="button" data-dish="bowl">Bowl</button>
+          <button class="choice-button" type="button" data-dish="stack">Stack</button>
+          <button class="choice-button" type="button" data-dish="board">Board</button>
+          <button class="choice-button" type="button" data-dish="drink">Drink</button>
+          <button class="choice-button" type="button" data-dish="texture">Texture</button>
+          <button class="choice-button" type="button" data-dish="table">Table</button>
+        </div>
+
         <div class="mode-strip" id="modeStrip" aria-label="Shot styles">
-          <button class="mode-button is-active" type="button" data-mode="flat">
+          <button class="mode-button" type="button" data-mode="flat">
             <span class="mode-icon flat-icon" aria-hidden="true"></span>
             <span>Flat lay</span>
           </button>
-          <button class="mode-button" type="button" data-mode="angle">
+          <button class="mode-button is-active" type="button" data-mode="angle">
             <span class="mode-icon angle-icon" aria-hidden="true"></span>
             <span>45 deg</span>
+          </button>
+          <button class="mode-button" type="button" data-mode="straight">
+            <span class="mode-icon straight-icon" aria-hidden="true"></span>
+            <span>Straight</span>
           </button>
           <button class="mode-button" type="button" data-mode="macro">
             <span class="mode-icon macro-icon" aria-hidden="true"></span>
@@ -111,6 +166,15 @@
             <span class="mode-icon spread-icon" aria-hidden="true"></span>
             <span>Table</span>
           </button>
+        </div>
+
+        <div class="choice-strip guide-strip" id="guideStrip" aria-label="Composition guides">
+          <button class="choice-button is-active" type="button" data-guide="clean">Clean</button>
+          <button class="choice-button" type="button" data-guide="lines">Lines</button>
+          <button class="choice-button" type="button" data-guide="layers">Layers</button>
+          <button class="choice-button" type="button" data-guide="frame">Frame</button>
+          <button class="choice-button" type="button" data-guide="pattern">Pattern</button>
+          <button class="choice-button" type="button" data-guide="space">Space</button>
         </div>
       </section>
 
@@ -128,6 +192,10 @@
           </div>
           <img id="reviewImage" alt="Captured food shot">
           <p id="reviewTip" class="review-tip">Clean photo captured without guides.</p>
+          <div class="review-edits" aria-label="Suggested edits">
+            <p>Next edit</p>
+            <ul id="reviewEdits"></ul>
+          </div>
           <div class="review-actions">
             <a class="secondary-button" id="downloadShot" href="#" download="plateful-shot.jpg">Download</a>
             <button class="primary-button" id="shareShot" type="button">Share</button>

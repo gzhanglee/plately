@@ -1030,6 +1030,99 @@ body.camera-ready .permission-panel {
   background: rgba(47, 143, 107, 0.2);
 }
 
+.guide-drawer {
+  border: 1px solid rgba(251, 248, 239, 0.12);
+  border-radius: 8px;
+  background: rgba(17, 19, 20, 0.3);
+}
+
+.guide-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.guide-summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-summary > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.guide-summary > span > span {
+  color: rgba(251, 248, 239, 0.62);
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.guide-summary strong {
+  overflow: hidden;
+  color: var(--paper);
+  font-size: 0.9rem;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guide-summary i {
+  position: relative;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(251, 248, 239, 0.08);
+  transition: transform 180ms ease;
+}
+
+.guide-summary i::before,
+.guide-summary i::after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  width: 8px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--paper);
+}
+
+.guide-summary i::before {
+  left: 8px;
+  transform: rotate(42deg);
+}
+
+.guide-summary i::after {
+  right: 8px;
+  transform: rotate(-42deg);
+}
+
+.guide-drawer[open] .guide-summary {
+  border-bottom: 1px solid rgba(251, 248, 239, 0.1);
+  border-radius: 8px 8px 0 0;
+}
+
+.guide-drawer[open] .guide-summary i {
+  transform: rotate(180deg);
+}
+
+.guide-drawer .guide-strip {
+  padding: 8px 10px 10px;
+}
+
+.guide-drawer .choice-button {
+  min-height: 36px;
+}
+
 .mode-strip {
   display: grid;
   grid-auto-flow: column;

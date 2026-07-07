@@ -84,21 +84,27 @@ const dishes = {
 
 const guides = {
   clean: {
+    label: "Clean frame",
     tip: "Keep the hero dish clear, then remove anything that distracts from it."
   },
   lines: {
+    label: "Lead lines",
     tip: "Use a utensil, table edge, or garnish line to point toward the best bite."
   },
   layers: {
+    label: "Depth",
     tip: "Build foreground, hero, and background so the dish feels deeper."
   },
   frame: {
+    label: "Frame",
     tip: "Let the plate, fork, glass, or napkin frame the ingredient people should notice."
   },
   pattern: {
+    label: "Repeats",
     tip: "Repeat circles, slices, or small plates so the eye keeps moving."
   },
   space: {
+    label: "Open space",
     tip: "Leave one clean area of table for a calmer, more editorial crop."
   }
 };
@@ -142,6 +148,8 @@ const els = {
   lightCompass: document.querySelector("#lightCompass"),
   dishStrip: document.querySelector("#dishStrip"),
   modeStrip: document.querySelector("#modeStrip"),
+  guideDrawer: document.querySelector("#guideDrawer"),
+  guideSummary: document.querySelector("#guideSummary"),
   guideStrip: document.querySelector("#guideStrip"),
   horizonMeter: document.querySelector("#horizonMeter span"),
   reviewSheet: document.querySelector("#reviewSheet"),
@@ -194,6 +202,7 @@ function setGuide(guide) {
   for (const button of els.guideStrip.querySelectorAll(".choice-button")) {
     button.classList.toggle("is-active", button.dataset.guide === guide);
   }
+  els.guideSummary.textContent = guides[guide].label;
   setTip(guides[guide].tip);
 }
 
@@ -729,7 +738,10 @@ function bindEvents() {
   });
   els.guideStrip.addEventListener("click", (event) => {
     const button = event.target.closest("[data-guide]");
-    if (button) setGuide(button.dataset.guide);
+    if (button) {
+      setGuide(button.dataset.guide);
+      els.guideDrawer.open = false;
+    }
   });
   els.closeReview.addEventListener("click", closeReviewSheet);
   els.closeReviewButton.addEventListener("click", closeReviewSheet);

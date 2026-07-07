@@ -168,14 +168,23 @@
           </button>
         </div>
 
-        <div class="choice-strip guide-strip" id="guideStrip" aria-label="Composition guides">
-          <button class="choice-button is-active" type="button" data-guide="clean">Clean</button>
-          <button class="choice-button" type="button" data-guide="lines">Lines</button>
-          <button class="choice-button" type="button" data-guide="layers">Layers</button>
-          <button class="choice-button" type="button" data-guide="frame">Frame</button>
-          <button class="choice-button" type="button" data-guide="pattern">Pattern</button>
-          <button class="choice-button" type="button" data-guide="space">Space</button>
-        </div>
+        <details class="guide-drawer" id="guideDrawer">
+          <summary class="guide-summary">
+            <span>
+              <span>Composition</span>
+              <strong id="guideSummary">Clean frame</strong>
+            </span>
+            <i aria-hidden="true"></i>
+          </summary>
+          <div class="choice-strip guide-strip" id="guideStrip" aria-label="Composition guides">
+            <button class="choice-button is-active" type="button" data-guide="clean">Clean</button>
+            <button class="choice-button" type="button" data-guide="lines">Lead lines</button>
+            <button class="choice-button" type="button" data-guide="layers">Depth</button>
+            <button class="choice-button" type="button" data-guide="frame">Frame</button>
+            <button class="choice-button" type="button" data-guide="pattern">Repeats</button>
+            <button class="choice-button" type="button" data-guide="space">Open space</button>
+          </div>
+        </details>
       </section>
 
       <section class="review-sheet" id="reviewSheet" hidden aria-label="Captured shot review">

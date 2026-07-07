@@ -208,6 +208,35 @@ function updateAngleCard() {
     : `${preset.angle} is the usual pick for this dish.`;
 }
 
+function waitForVideoFrame() {
+  if (els.video.videoWidth > 0 && els.video.readyState >= 2) {
+    return Promise.resolve();
+  }
+
+  if ("requestVideoFrameCallback" in els.video) {
+    return new Promise((resolve) => {
+      const timeout = window.setTimeout(resolve, 1800);
+      els.video.requestVideoFrameCallback(() => {
+        window.clearTimeout(timeout);
+        resolve();
+      });
+    });
+  }
+
+  return new Promise((resolve) => {
+    const timeout = window.setTimeout(resolve, 1800);
+    const done = () => {
+      window.clearTimeout(timeout);
+      els.video.removeEventListener("loadedmetadata", done);
+      els.video.removeEventListener("canplay", done);
+      resolve();
+    };
+
+    els.video.addEventListener("loadedmetadata", done, { once: true });
+    els.video.addEventListener("canplay", done, { once: true });
+  });
+}
+
 async function startCamera() {
   if (!navigator.mediaDevices?.getUserMedia) {
     showCameraMessage("This browser cannot open the camera. You can still explore the overlays here.");
@@ -222,6 +251,7 @@ async function startCamera() {
   }
 
   stopCamera();
+  els.body.classList.add("camera-starting");
 
   try {
     state.stream = await navigator.mediaDevices.getUserMedia({
@@ -234,22 +264,29 @@ async function startCamera() {
     });
     els.video.srcObject = state.stream;
     await els.video.play();
+    await waitForVideoFrame();
+    els.body.classList.remove("camera-starting");
     els.body.classList.add("camera-ready");
     setTip("Hold on the plate for a second while I read the light.");
     window.setTimeout(analyzeLoop, 250);
   } catch (error) {
+    els.body.classList.remove("camera-starting", "camera-ready");
+    els.video.srcObject = null;
     showCameraMessage("Camera permission was not granted, or no camera was found. The app is still showing the guide preview.");
     setTip("Allow camera access, then start again.");
   }
 }
 
 function stopCamera() {
-  if (!state.stream) return;
-  for (const track of state.stream.getTracks()) {
-    track.stop();
+  if (state.stream) {
+    for (const track of state.stream.getTracks()) {
+      track.stop();
+    }
   }
   state.stream = null;
-  els.body.classList.remove("camera-ready");
+  els.video.pause();
+  els.video.srcObject = null;
+  els.body.classList.remove("camera-starting", "camera-ready");
 }
 
 function showCameraMessage(message) {

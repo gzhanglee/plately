@@ -74,14 +74,20 @@ button {
 }
 
 .camera-preview {
-  z-index: 1;
+  z-index: 2;
   opacity: 0;
+  background: #050707;
   transform: scale(1.01);
   transition: opacity 240ms ease;
 }
 
 body.camera-ready .camera-preview {
   opacity: 1;
+}
+
+body.camera-ready .demo-table {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .analysis-canvas {
@@ -95,6 +101,7 @@ body.camera-ready .camera-preview {
   background:
     linear-gradient(115deg, rgba(255, 255, 255, 0.12), transparent 34%),
     repeating-linear-gradient(90deg, #28302e 0 32px, #242b2a 32px 64px);
+  transition: opacity 180ms ease, visibility 180ms ease;
 }
 
 .demo-plate {
